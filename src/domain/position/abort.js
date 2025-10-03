@@ -174,6 +174,8 @@ const processPositionAbortBin = async (
 const _constructAbortResultMessage = (binItem, id, from, notifyTo, isOriginalId, isFx) => {
   let apiErrorCode = ErrorHandler.Enums.FSPIOPErrorCodes.PAYEE_REJECTION
   let fromCalculated = from
+  let fspiopError
+
   if (binItem.message?.value.metadata.event.action === Enum.Events.Event.Action.FX_ABORT_VALIDATION || binItem.message?.value.metadata.event.action === Enum.Events.Event.Action.ABORT_VALIDATION) {
     fromCalculated = Config.HUB_NAME
     apiErrorCode = ErrorHandler.Enums.FSPIOPErrorCodes.VALIDATION_ERROR
@@ -181,13 +183,35 @@ const _constructAbortResultMessage = (binItem, id, from, notifyTo, isOriginalId,
   if (!isOriginalId) {
     fromCalculated = Config.HUB_NAME
   }
-  const fspiopError = ErrorHandler.Factory.createFSPIOPError(
-    apiErrorCode,
-    null,
-    null,
-    null,
-    null
-  ).toApiErrorObject(Config.ERROR_HANDLING)
+
+  // preserve the original error information if available
+  if (binItem.decodedPayload?.errorInformation) {
+    try {
+      // Preserve the original error information from the payee for ABORT action
+      fspiopError = ErrorHandler.Factory.createFSPIOPErrorFromErrorInformation(
+        binItem.decodedPayload.errorInformation
+      ).toApiErrorObject(Config.ERROR_HANDLING)
+    } catch (err) {
+      Logger.isErrorEnabled && Logger.error(`_constructAbortResultMessage::Failed to parse original error, using default: ${err.message}`)
+      // Fall back to creating a generic error if the original error is invalid
+      fspiopError = ErrorHandler.Factory.createFSPIOPError(
+        apiErrorCode,
+        null,
+        null,
+        null,
+        null
+      ).toApiErrorObject(Config.ERROR_HANDLING)
+    }
+  } else {
+    // No original error information available, create a generic error
+    fspiopError = ErrorHandler.Factory.createFSPIOPError(
+      apiErrorCode,
+      null,
+      null,
+      null,
+      null
+    ).toApiErrorObject(Config.ERROR_HANDLING)
+  }
 
   const state = Utility.StreamingProtocol.createEventState(
     Enum.Events.EventStatus.FAILURE.status,
