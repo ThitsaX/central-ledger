@@ -379,7 +379,7 @@ const processBins = async (bins, trx) => {
       // Get the latest transferStateChangeId to save it altogether as an error log
       transferError.transferStateChangeId = fetchedTransferStateChanges[transferError.transferId].transferStateChangeId
     }
-    await BatchPositionModel.bulkInsertTransferErrors(trx, accumulatedTransferErrors);
+    await BatchPositionModel.bulkInsertTransferErrors(trx, accumulatedTransferErrors)
 
     if (changePositions) {
       // Mutate accumulated positionChanges with transferStateChangeIds and fxTransferStateChangeIds
