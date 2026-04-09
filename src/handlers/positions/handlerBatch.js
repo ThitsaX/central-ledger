@@ -34,6 +34,7 @@
  */
 
 const EventSdk = require('@mojaloop/event-sdk')
+const Logger = require('@mojaloop/central-services-logger')
 const BinProcessor = require('../../domain/position/binProcessor')
 const SettlementModelCached = require('../../models/settlement/settlementModelCached')
 const Utility = require('@mojaloop/central-services-shared').Util
@@ -154,7 +155,9 @@ const positions = batchConfig => async (error, messages) => {
           trx = null
           if (_isDeadlockError(err) && retryCount < Config.POSITION_BATCH_DEADLOCK_RETRIES) {
             retryCount++
-            await new Promise(resolve => setTimeout(resolve, Config.POSITION_BATCH_DEADLOCK_RETRY_DELAY_MS * retryCount))
+            const delay = Config.POSITION_BATCH_DEADLOCK_RETRY_DELAY_MS * retryCount
+            Logger.isWarnEnabled && Logger.warn(`processBins: deadlock detected, retrying (attempt ${retryCount}/${Config.POSITION_BATCH_DEADLOCK_RETRIES}) after ${delay}ms — ${err.message}`)
+            await new Promise(resolve => setTimeout(resolve, delay))
             trx = await BatchPositionModel.startDbTransaction()
           } else {
             throw err
