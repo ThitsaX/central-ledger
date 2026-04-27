@@ -1278,6 +1278,22 @@ const transferStateAndPositionUpdate = async function (param1, enums, trx = null
             createdDate: param1.createdDate
           })
           .transacting(trx)
+
+        // Get the latest transferStateChangeId
+        const transferStateChange = await knex('transferStateChange')
+          .where('transferId', param1.transferId)
+          .orderBy('transferStateChangeId', 'desc')
+          .first()
+          .transacting(trx)
+
+        // Add transfer error log too
+        await knex('transferError').insert({
+          transferId: param1.transferId,
+          transferStateChangeId: transferStateChange.transferStateChangeId,
+          errorCode: param1.errorCode,
+          reason: param1.reason,
+          createdDate: param1.createdDate
+        }).transacting(trx)
       }
       const transferStateChangeId = await knex('transferStateChange')
         .insert({
@@ -1502,6 +1518,7 @@ const reconciliationTransferReserve = async function (payload, transactionTimest
 
       if (payload.action === Enum.Transfers.AdminTransferAction.RECORD_FUNDS_OUT_PREPARE_RESERVE &&
         positionResult.drPositionValue > 0) {
+        payload.errorCode = ErrorHandler.Enums.FSPIOPErrorCodes.INTERNAL_SERVER_ERROR.code
         payload.reason = 'Aborted due to insufficient funds'
         payload.action = Enum.Transfers.AdminTransferAction.RECORD_FUNDS_OUT_ABORT
         await TransferFacade.reconciliationTransferAbort(payload, transactionTimestamp, enums, trx)
@@ -1598,6 +1615,7 @@ const reconciliationTransferAbort = async function (payload, transactionTimestam
         const param1 = {
           transferId: payload.transferId,
           transferStateId: enums.transferState.ABORTED_REJECTED,
+          errorCode: payload.errorCode,
           reason: payload.reason,
           createdDate: transactionTimestamp,
           drUpdated: true,
