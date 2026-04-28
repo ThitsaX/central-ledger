@@ -34,6 +34,7 @@
  */
 
 const EventSdk = require('@mojaloop/event-sdk')
+const Logger = require('@mojaloop/central-services-logger')
 const BinProcessor = require('../../domain/position/binProcessor')
 const SettlementModelCached = require('../../models/settlement/settlementModelCached')
 const Utility = require('@mojaloop/central-services-shared').Util
@@ -50,6 +51,12 @@ const { BATCHING } = require('../../shared/constants')
 
 const consumerCommit = true
 const rethrow = require('../../shared/rethrow')
+
+const _isDeadlockError = (err) =>
+  err?.code === 'ER_LOCK_DEADLOCK' ||
+  err?.errno === 1213 ||
+  err?.message?.includes('ER_LOCK_DEADLOCK') ||
+  (typeof err?.cause === 'string' && err.cause.includes('ER_LOCK_DEADLOCK'))
 
 /**
  * @function positions
@@ -131,12 +138,32 @@ const positions = batchConfig => async (error, messages) => {
   }))
 
   // Start DB Transaction if there are any bins to process
-  const trx = !!Object.keys(bins).length && await BatchPositionModel.startDbTransaction()
+  let trx = !!Object.keys(bins).length && await BatchPositionModel.startDbTransaction()
 
   try {
     if (trx) {
       // Call Bin Processor with the list of account-bins and trx
-      const result = await BinProcessor.processBins(bins, trx)
+      // Retry on deadlock: MySQL recommends retrying the entire transaction on ER_LOCK_DEADLOCK
+      let result
+      let retryCount = 0
+      while (true) {
+        try {
+          result = await BinProcessor.processBins(bins, trx)
+          break
+        } catch (err) {
+          await trx.rollback()
+          trx = null
+          if (_isDeadlockError(err) && retryCount < Config.POSITION_BATCH_DEADLOCK_RETRIES) {
+            retryCount++
+            const delay = Config.POSITION_BATCH_DEADLOCK_RETRY_DELAY_MS * retryCount
+            Logger.isWarnEnabled && Logger.warn(`processBins: deadlock detected, retrying (attempt ${retryCount}/${Config.POSITION_BATCH_DEADLOCK_RETRIES}) after ${delay}ms — ${err.message}`)
+            await new Promise(resolve => setTimeout(resolve, delay))
+            trx = await BatchPositionModel.startDbTransaction()
+          } else {
+            throw err
+          }
+        }
+      }
 
       // If Bin Processor processed bins successfully, commit Kafka offset
       // Commit the offset of last message in the array

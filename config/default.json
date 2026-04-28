@@ -329,6 +329,10 @@
           }
         },
         "POSITION_BATCH": {
+          "deadlock": {
+            "retries": 3,
+            "retryDelayMs": 50
+          },
           "config": {
             "options": {
               "mode": 2,
