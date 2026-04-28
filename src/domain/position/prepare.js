@@ -125,7 +125,7 @@ const processPositionPrepareBin = async (
           transferId: transfer.transferId,
           transferStateChangeId: null,
           errorCode: fspiopError.errorInformation.errorCode,
-          errorDescription: reason,
+          errorDescription: reason
         })
 
         const state = Utility.StreamingProtocol.createEventState(
@@ -176,7 +176,7 @@ const processPositionPrepareBin = async (
           transferId: transfer.transferId,
           transferStateChangeId: null,
           errorCode: fspiopError.errorInformation.errorCode,
-          errorDescription: reason,
+          errorDescription: reason
         })
 
         const state = Utility.StreamingProtocol.createEventState(
@@ -227,7 +227,7 @@ const processPositionPrepareBin = async (
           transferId: transfer.transferId,
           transferStateChangeId: null,
           errorCode: fspiopError.errorInformation.errorCode,
-          errorDescription: reason,
+          errorDescription: reason
         })
 
         const state = Utility.StreamingProtocol.createEventState(

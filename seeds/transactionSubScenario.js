@@ -63,7 +63,7 @@ const transactionSubScenarios = [
     name: 'CROSS_BORDER_REMITTANCE',
     description: 'International remittance between countries (inbound or outbound)'
   }
-];
+]
 
 exports.seed = async function (knex) {
   try {
@@ -72,4 +72,4 @@ exports.seed = async function (knex) {
     console.log(`Uploading seeds for transactionSubScenario has failed with the following error: ${err}`)
     return -1000
   }
-};
+}
