@@ -91,6 +91,8 @@ export interface ApplicationConfig {
     proxyConfig: ProxyCacheConfig
   },
   KAFKA_CONFIG: KafkaConfig,
+  POSITION_BATCH_DEADLOCK_RETRIES: number,
+  POSITION_BATCH_DEADLOCK_RETRY_DELAY_MS: number,
   PARTICIPANT_INITIAL_POSITION: number,
   RUN_MIGRATIONS: boolean,
   RUN_DATA_MIGRATIONS: boolean,
@@ -226,6 +228,13 @@ interface KafkaTopicTemplate {
   REGEX: string
 }
 
+export interface DeadlockRetryConfig {
+  deadlock: {
+    retries: number,
+    retryDelayMs: number
+  }
+}
+
 export interface KafkaConsumerConfig {
   config: {
     options: KafkaConsumerGeneralOptions,
@@ -322,7 +331,7 @@ export interface KafkaConfig {
       GET: KafkaConsumerConfig,
       FULFIL: KafkaConsumerConfig,
       POSITION: KafkaConsumerConfig,
-      POSITION_BATCH: KafkaConsumerConfig,
+      POSITION_BATCH: DeadlockRetryConfig & KafkaConsumerConfig,
     },
     ADMIN: {
       TRANSFER: KafkaConsumerConfig

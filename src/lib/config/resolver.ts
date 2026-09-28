@@ -134,6 +134,8 @@ const resolveConfig = (rawConfig: any): UnsafeApplicationConfig => {
     WINDOW_AGGREGATION_RETRY_COUNT: rawConfig.WINDOW_AGGREGATION.RETRY_COUNT,
     WINDOW_AGGREGATION_RETRY_INTERVAL: rawConfig.WINDOW_AGGREGATION.RETRY_INTERVAL,
     KAFKA_CONFIG: kafka,
+    POSITION_BATCH_DEADLOCK_RETRIES: defaultTo(kafka.CONSUMER.TRANSFER?.POSITION_BATCH?.deadlock?.retries, 3),
+    POSITION_BATCH_DEADLOCK_RETRY_DELAY_MS: defaultTo(kafka.CONSUMER.TRANSFER?.POSITION_BATCH?.deadlock?.retryDelayMs, 50),
     SERVER_PRINT_ROUTES_ON_STARTUP: defaultTo(rawConfig.SERVER_PRINT_ROUTES_ON_STARTUP, true),
     LEDGER: defaultTo(rawConfig.LEDGER, 'LEGACY'),
     EXPERIMENTAL: {
@@ -198,6 +200,8 @@ const parseAndValidateConfig = (unsafeConfig: UnsafeApplicationConfig): Applicat
   assertBoolean(unsafeConfig.API_DOC_ENDPOINTS_ENABLED)
   assertBoolean(unsafeConfig.PAYEE_PARTICIPANT_CURRENCY_VALIDATION_ENABLED)
   assertBoolean(unsafeConfig.SERVER_PRINT_ROUTES_ON_STARTUP)
+  assertNumber(unsafeConfig.POSITION_BATCH_DEADLOCK_RETRIES)
+  assertNumber(unsafeConfig.POSITION_BATCH_DEADLOCK_RETRY_DELAY_MS)
 
   assert(unsafeConfig.EXPERIMENTAL)
   assertProvisioning(unsafeConfig.EXPERIMENTAL.PROVISIONING)
