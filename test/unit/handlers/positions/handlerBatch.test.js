@@ -41,6 +41,7 @@ const Enum = require('@mojaloop/central-services-shared').Enum
 const Proxyquire = require('proxyquire')
 const Logger = require('../../../../src/shared/logger').logger
 const ProxyCache = require('#src/lib/proxyCache')
+const POSITION_BATCH_DEADLOCK_RETRIES = require('../../../../src/lib/config').POSITION_BATCH_DEADLOCK_RETRIES
 
 const topicName = 'topic-transfer-position-batch'
 
@@ -411,6 +412,31 @@ Test('Position handler', positionBatchHandlerTest => {
         test.ok(Kafka.produceGeneralMessage.notCalled, 'produceGeneralMessage should not be called')
         test.ok(trxStub.rollback.calledOnce, 'trx.rollback should be called once')
         test.ok(trxStub.commit.notCalled, 'trx.commit should not be called')
+        test.end()
+      } catch (err) {
+        test.fail('Error should not be thrown')
+        test.end()
+      }
+    })
+
+    positionsTest.test('retry with new DB transaction if BinProcessor fails with Deadlock Error', async test => {
+      // Arrange
+      const retryCount = POSITION_BATCH_DEADLOCK_RETRIES || 3
+      BinProcessor.processBins.rejects(new Error('ER_LOCK_DEADLOCK'))
+      await Consumer.createHandler(topicName, config, command)
+      Kafka.transformGeneralTopicName.returns(topicName)
+      Kafka.getKafkaConfig.returns(config)
+      Kafka.proceed.returns(true)
+
+      // Act
+      try {
+        await allTransferHandlers.positions(null, messages)
+        test.equal(BinProcessor.processBins.getCall(0).args[1], trxStub)
+        test.ok(Kafka.proceed.notCalled, 'kafkaProceed should not be called')
+        test.ok(Kafka.produceGeneralMessage.notCalled, 'produceGeneralMessage should not be called')
+        test.ok(trxStub.commit.notCalled, 'trx.commit should not be called')
+        test.equal(trxStub.rollback.callCount, (retryCount + 1), `trx.rollback should be called ${retryCount} extra times`)
+        test.equal(BatchPositionModel.startDbTransaction.callCount, (retryCount + 1), `startDbTransaction should be called ${retryCount} extra times`)
         test.end()
       } catch (err) {
         test.fail('Error should not be thrown')

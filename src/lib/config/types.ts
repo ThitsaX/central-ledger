@@ -331,7 +331,7 @@ export interface KafkaConfig {
       GET: KafkaConsumerConfig,
       FULFIL: KafkaConsumerConfig,
       POSITION: KafkaConsumerConfig,
-      POSITION_BATCH: DeadlockRetryConfig & KafkaConsumerConfig,
+      POSITION_BATCH: Partial<DeadlockRetryConfig> & KafkaConsumerConfig,
     },
     ADMIN: {
       TRANSFER: KafkaConsumerConfig

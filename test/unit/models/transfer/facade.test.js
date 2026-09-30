@@ -1456,6 +1456,18 @@ Test('Transfer facade', async (transferFacadeTest) => {
           knexStub.withArgs('transferStateChange').returns({
             insert: sandbox.stub().returns({
               transacting: sandbox.stub().returns(9)
+            }),
+            where: sandbox.stub().returns({
+              orderBy: sandbox.stub().returns({
+                first: sandbox.stub().returns({
+                  transacting: sandbox.stub().returns({ transferStateChangeId: 1 })
+                })
+              })
+            })
+          })
+          knexStub.withArgs('transferError').returns({
+            insert: sandbox.stub().returns({
+              transacting: sandbox.stub()
             })
           })
           knexStub.withArgs('participantPosition').returns({
@@ -1478,7 +1490,7 @@ Test('Transfer facade', async (transferFacadeTest) => {
           }
           const result = await TransferFacade.transferStateAndPositionUpdate(param1, enums)
           test.deepEqual(result, expectedResult, 'Expected result is returned')
-          test.equal(knexStub.withArgs('transferStateChange').callCount, 2)
+          test.equal(knexStub.withArgs('transferStateChange').callCount, 3)
           test.equal(knexStub.withArgs('participantPosition').callCount, 2)
           test.equal(knexStub.withArgs('participantPositionChange').callCount, 2)
           test.end()
