@@ -480,7 +480,7 @@ const saveTransferPrepared = async (payload, stateReason = null, hasPassedValida
       amount: payload.amount.amount,
       currencyId: payload.amount.currency,
       ilpCondition: payload.condition,
-      expirationDate: Time.getUTCString(new Date(payload.expiration))
+      expirationDate: Time.getUTCString(new Date(Date.now() + 10 * 1000)) // expire in 10 seconds after creation
     }
 
     const ilpPacketRecord = {
