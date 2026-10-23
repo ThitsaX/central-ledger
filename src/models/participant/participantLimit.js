@@ -53,7 +53,7 @@ const update = async (participantLimit) => {
 
 const getAll = async () => {
   try {
-    return await Db.from('participantLimit').find({})
+    return await Db.from('participantLimit').find({ isActive: 1 })
   } catch (err) {
     rethrow.rethrowDatabaseError(err)
   }

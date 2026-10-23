@@ -571,7 +571,7 @@ const addLimitAndInitialPosition = async (participantCurrencyId, settlementAccou
 * @returns {object} participantLimit - Returns participantLimit updated/inserted object if successful, or throws an error if failed
  */
 
-const adjustLimits = async (participantCurrencyId, limit, trx) => {
+const adjustLimits = async (participantCurrencyId, limit, trx, invalidateCache = true) => {
   try {
     const trxFunction = async (trx) => {
       try {
@@ -598,6 +598,9 @@ const adjustLimits = async (participantCurrencyId, limit, trx) => {
         }
         const result = await knex('participantLimit').transacting(trx).insert(newLimit)
         newLimit.participantLimitId = result[0]
+        if (Cache.isCacheEnabled() && invalidateCache) {
+          await ParticipantLimitCached.invalidateParticipantLimitCache()
+        }
         return {
           participantLimit: newLimit
         }
