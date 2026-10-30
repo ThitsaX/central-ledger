@@ -32,7 +32,7 @@ const ParticipantLimitModel = require('../../models/participant/participantLimit
 const rethrow = require('../../shared/rethrow')
 
 let cacheClient
-let participantLimitAllCacheKey
+const participantLimitAllCacheKey = 'all'
 
 /*
   Private API
@@ -62,7 +62,7 @@ const buildUnifiedParticipantsLimitData = (allLimitParticipants) => {
 
 const getParticipantLimitCached = () => cacheClient.get(participantLimitAllCacheKey)
 
-const generate = async function () {
+const generate = async function (key) {
   const allLimitParticipants = await ParticipantLimitModel.getAll()
   return buildUnifiedParticipantsLimitData(allLimitParticipants)
 }
@@ -72,14 +72,7 @@ const generate = async function () {
 */
 exports.initialize = async () => {
   /* Register as cache client */
-  const participantLimitCacheClientMeta = {
-    id: 'participantLimit',
-    generate,
-    preloadCache: getParticipantLimitCached
-  }
-
-  cacheClient = Cache.registerCacheClient(participantLimitCacheClientMeta)
-  participantLimitAllCacheKey = cacheClient.createKey('all')
+  cacheClient = Cache.registerCacheClient({ id: 'participantLimit', generate, preloadCache: getParticipantLimitCached })
 }
 
 exports.invalidateParticipantLimitCache = async () => {
