@@ -64,7 +64,7 @@ const initCache = async function () {
   catboxMemoryClient = new CatboxMemory.Engine({
     maxByteSize: Config.CACHE_CONFIG.MAX_BYTE_SIZE
   })
-  
+
   try {
     await catboxMemoryClient.start()
 
