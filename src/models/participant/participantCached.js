@@ -125,3 +125,4 @@ exports.create = withInvalidate('create')
 exports.update = withInvalidate('update')
 exports.destroyByName = withInvalidate('destroyByName')
 exports.destroyParticipantEndpointByParticipantId = withInvalidate('destroyParticipantEndpointByParticipantId')
+exports.build = buildUnifiedParticipantsData

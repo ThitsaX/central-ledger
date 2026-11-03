@@ -101,3 +101,4 @@ exports.insert = withInvalidate('insert')
 exports.update = withInvalidate('update')
 exports.destroyByParticipantCurrencyId = withInvalidate('destroyByParticipantCurrencyId')
 exports.destroyByParticipantId = withInvalidate('destroyByParticipantId')
+exports.build = buildUnifiedParticipantsLimitData

@@ -144,3 +144,4 @@ const withInvalidate = (theFunctionName) => {
 exports.create = withInvalidate('create')
 exports.update = withInvalidate('update')
 exports.destroyByParticipantId = withInvalidate('destroyByParticipantId')
+exports.build = buildUnifiedParticipantsCurrencyData

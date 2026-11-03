@@ -109,3 +109,5 @@ exports.getParticipantCurrencyByParticipantIds = async (trx, participantIds) => 
     rethrow.rethrowCachedDatabaseError(err)
   }
 }
+
+exports.build = buildUnifiedParticipantCurrencyData

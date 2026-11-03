@@ -116,3 +116,5 @@ exports.getAll = async () => {
     rethrow.rethrowCachedDatabaseError(err)
   }
 }
+
+exports.build = buildUnifiedSettlementModelsData
