@@ -130,7 +130,7 @@ Test('Participant Limit model', async (participantLimitTest) => {
 
   await participantLimitTest.test('getAll participants limit', async (assert) => {
     try {
-      Db.participantLimit.find.withArgs({}).returns(1)
+      Db.participantLimit.find.withArgs({ isActive: 1 }).returns(1)
       const result = await Model.getAll()
       assert.equal(result, 1, `returns ${result}`)
       assert.end()
@@ -143,7 +143,7 @@ Test('Participant Limit model', async (participantLimitTest) => {
 
   await participantLimitTest.test('getAll participant limit should throw an error', async (assert) => {
     try {
-      Db.participantLimit.find.withArgs({}).throws(new Error('message'))
+      Db.participantLimit.find.withArgs({ isActive: 1 }).throws(new Error('message'))
       await Model.getAll()
       assert.fail('Error not thrown!')
       assert.end()

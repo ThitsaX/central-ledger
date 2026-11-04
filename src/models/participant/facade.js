@@ -607,11 +607,13 @@ const adjustLimits = async (participantCurrencyId, limit, trx) => {
     }
 
     const knex = Db.getKnex()
-    if (trx) {
-      return trxFunction(trx)
-    } else {
-      return knex.transaction(trxFunction)
+    const result = trx ? await trxFunction(trx) : await knex.transaction(trxFunction)
+
+    if (!trx && Cache.isCacheEnabled()) {
+      await ParticipantLimitCached.invalidateParticipantLimitCache()
     }
+
+    return result
   } catch (err) {
     rethrow.rethrowDatabaseError(err)
   }
