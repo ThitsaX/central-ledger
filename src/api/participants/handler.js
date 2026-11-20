@@ -43,7 +43,7 @@ const LocalEnum = {
   disabled: 'disabled'
 }
 
-const entityItem = ({ name, createdDate, isActive, currencyList, isProxy }, ledgerAccountIds) => {
+const entityItem = ({ name, createdDate, isActive, currencyList, isProxy, description }, ledgerAccountIds) => {
   const link = UrlParser.toParticipantUri(name)
   const accounts = currencyList.map((currentValue) => {
     return {
@@ -57,6 +57,7 @@ const entityItem = ({ name, createdDate, isActive, currencyList, isProxy }, ledg
   })
   return {
     name,
+    description: description ?? null,
     id: link,
     created: createdDate,
     isActive,
