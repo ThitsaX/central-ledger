@@ -41,6 +41,7 @@ Test('Participant', participantHandlerTest => {
     {
       participantId: 1,
       name: 'fsp1',
+      description: 'fsp1 description',
       currency: 'USD',
       isActive: 1,
       createdDate: '2018-07-17T16:04:24.185Z',
@@ -53,6 +54,7 @@ Test('Participant', participantHandlerTest => {
     {
       participantId: 2,
       name: 'fsp2',
+      description: null,
       currency: 'EUR',
       isActive: 1,
       createdDate: '2018-07-17T16:04:24.185Z',
@@ -65,6 +67,7 @@ Test('Participant', participantHandlerTest => {
     {
       participantId: 3,
       name: 'Hub',
+      description: '',
       currency: 'USD',
       isActive: 1,
       createdDate: '2018-07-17T16:04:24.185Z',
@@ -76,6 +79,7 @@ Test('Participant', participantHandlerTest => {
     {
       participantId: 4,
       name: 'xnProxy',
+      description: null,
       currency: 'EUR',
       isActive: 1,
       createdDate: '2018-07-17T16:04:24.185Z',
@@ -90,6 +94,7 @@ Test('Participant', participantHandlerTest => {
   const participantResults = [
     {
       name: 'fsp1',
+      description: 'fsp1 description',
       id: 'https://central-ledger/participants/fsp1',
       created: '2018-07-17T16:04:24.185Z',
       isActive: 1,
@@ -104,6 +109,7 @@ Test('Participant', participantHandlerTest => {
     },
     {
       name: 'fsp2',
+      description: null,
       id: 'https://central-ledger/participants/fsp2',
       created: '2018-07-17T16:04:24.185Z',
       isActive: 1,
@@ -118,6 +124,7 @@ Test('Participant', participantHandlerTest => {
     },
     {
       name: 'Hub',
+      description: '',
       id: 'https://central-ledger/participants/Hub',
       created: '2018-07-17T16:04:24.185Z',
       isActive: 1,
@@ -131,6 +138,7 @@ Test('Participant', participantHandlerTest => {
     },
     {
       name: 'xnProxy',
+      description: null,
       id: 'https://central-ledger/participants/xnProxy',
       created: '2018-07-17T16:04:24.185Z',
       isActive: 1,
@@ -283,6 +291,7 @@ Test('Participant', participantHandlerTest => {
       const participant = {
         participantId: 1,
         name: 'fsp1',
+        description: 'fsp1 description',
         currency: 'USD',
         isActive: 1,
         createdDate: '2018-07-17T16:04:24.185Z',
@@ -374,6 +383,7 @@ Test('Participant', participantHandlerTest => {
       const participant = {
         participantId: 1,
         name: 'fsp1',
+        description: 'fsp1 description',
         currency: 'USD',
         isActive: 1,
         createdDate: '2018-07-17T16:04:24.185Z',
